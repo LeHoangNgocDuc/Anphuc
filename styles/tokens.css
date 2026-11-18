@@ -1,0 +1,43 @@
+/* AN PHUC EDUCATION - DESIGN TOKENS | STAGE 1 */
+:root {
+  color-scheme: light dark;
+  --font-ui: "Be Vietnam Pro", system-ui, sans-serif;
+  --primary: oklch(52% 0.19 258);
+  --primary-strong: oklch(42% 0.18 258);
+  --primary-soft: light-dark(oklch(95.5% 0.025 255), oklch(26% 0.045 258));
+  --success: oklch(62% 0.17 155);
+  --success-soft: light-dark(oklch(96% 0.03 155), oklch(24% 0.035 155));
+  --accent: oklch(76% 0.16 75);
+  --warning: oklch(65% 0.18 35);
+  --canvas: light-dark(oklch(98.5% 0.005 255), oklch(16.5% 0.018 255));
+  --surface: light-dark(#ffffff, oklch(20% 0.023 260));
+  --surface-raised: light-dark(#ffffff, oklch(24% 0.024 260));
+  --surface-muted: light-dark(oklch(96.3% 0.01 255), oklch(24% 0.024 260));
+  --ink: light-dark(oklch(24% 0.025 260), oklch(94% 0.01 255));
+  --ink-secondary: light-dark(oklch(47% 0.025 255), oklch(75% 0.016 255));
+  --border: light-dark(oklch(90% 0.011 255), oklch(34% 0.019 255));
+  --focus: oklch(67% 0.16 255);
+  --shadow-sm: 0 4px 14px rgb(20 48 100 / 5%);
+  --shadow-md: 0 16px 45px rgb(20 48 100 / 8%);
+  --shadow-lg: 0 28px 80px rgb(20 48 100 / 12%);
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 34px;
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --content-max: 1280px;
+  --transition: 190ms ease;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+@media (prefers-reduced-motion: reduce) {
+  :root { scroll-behavior: auto; --transition: 0ms linear; }
+}

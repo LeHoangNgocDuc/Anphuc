@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kiểm tra dữ liệu Chặng 2 | An Phúc Education</title>
+  <meta name="description" content="Kiểm tra tầng dữ liệu Supabase/Local Demo và nhập ngân hàng câu hỏi từ Excel.">
+  <link rel="icon" href="./logo.jpg" type="image/jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/app.css">
+  <style>
+    .stage2-shell{max-width:1050px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:16px}
+    .stage2-head{display:flex;gap:15px;align-items:center}
+    .stage2-head img{width:76px;height:76px;object-fit:contain;background:#fff;border-radius:16px;padding:5px}
+    .stage2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .stage2-kpi{border:1px solid #dbe4ef;border-radius:14px;padding:14px;background:#f8fafc}
+    .stage2-kpi strong{display:block;font-size:24px;color:#174180}
+    .stage2-panel{border:1px solid #dae4f2;background:white;border-radius:17px;padding:20px}
+    .stage2-panel h2{font-size:19px;margin:0 0 10px}
+    .stage2-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+    .stage2-row .input{max-width:310px}
+    .stage2-table{width:100%;border-collapse:collapse;font-size:13px}
+    .stage2-table td,.stage2-table th{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left}
+    .stage2-table th{background:#f1f5f9}
+    .stage2-scroll{max-height:280px;overflow:auto}
+    .stage2-note{font-size:13px;color:#475569;line-height:1.65}
+    #stage2-status{padding:12px 14px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe}
+    #stage2-error:not(:empty){padding:12px;border-radius:12px;border:1px solid #fca5a5;background:#fef2f2;color:#b91c1c}
+    @media(max-width:600px){.stage2-head{align-items:flex-start}.stage2-head img{width:52px;height:52px}.stage2-panel{padding:14px}}
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script type="module" src="./js/stage2-test.js"></script>
+</head>
+<body>
+  <main class="stage2-shell">
+    <header class="stage2-head">
+      <img src="./logo.jpg" width="1248" height="1248" alt="Logo An Phúc Education" fetchpriority="high">
+      <div><p class="note">TRUNG TÂM TOÁN AN PHÚC</p><h1>Kiểm tra dữ liệu – Chặng 2</h1><p class="stage2-note">Vững kiến thức. Chắc tương lai.</p></div>
+    </header>
+    <p id="stage2-status" role="status" aria-live="polite">Đang khởi tạo kết nối...</p>
+    <p id="stage2-error" role="alert"></p>
+    <section class="stage2-panel" aria-labelledby="stage2-overview"><h2 id="stage2-overview">1. Trạng thái dữ liệu</h2>
+      <div class="stage2-grid">
+        <div class="stage2-kpi"><span>Chế độ</span><strong id="kpi-mode">–</strong></div>
+        <div class="stage2-kpi"><span>Học sinh</span><strong id="kpi-students">–</strong></div>
+        <div class="stage2-kpi"><span>Câu hỏi</span><strong id="kpi-questions">–</strong></div>
+      </div>
+      <div class="stage2-row"><button id="btn-stage2-refresh" class="btn btn-outline" type="button">Làm mới dữ liệu</button><button id="btn-stage2-reset" class="btn btn-soft" type="button" hidden>Đặt lại dữ liệu Demo</button><a class="btn btn-outline" href="./index.html">Quay về trang chính</a></div>
+      <p id="mode-explainer" class="stage2-note"></p>
+    </section>
+    <section class="stage2-panel" aria-labelledby="stage2-auth"><h2 id="stage2-auth">2. Đăng nhập giáo viên (Supabase)</h2>
+      <form id="stage2-teacher-login" class="stage2-row">
+        <input class="input" id="stage2-email" type="email" autocomplete="username" placeholder="Email giáo viên" aria-label="Email giáo viên" required>
+        <input class="input" id="stage2-password" type="password" autocomplete="current-password" placeholder="Mật khẩu" aria-label="Mật khẩu" required>
+        <button class="btn btn-primary" type="submit">Đăng nhập</button>
+        <button class="btn btn-outline" id="btn-stage2-logout" type="button">Đăng xuất</button>
+      </form>
+      <p class="stage2-note">Demo: không cần tài khoản. Supabase thật: phải có Supabase Auth email và UUID được cấp quyền trong bảng <code>staff_roles</code>. Không có mật khẩu mặc định trong mã nguồn.</p>
+      <p id="stage2-auth-status" role="status" aria-live="polite" class="stage2-note"></p>
+    </section>
+    <section class="stage2-panel" aria-labelledby="stage2-import"><h2 id="stage2-import">3. Đọc và kiểm tra ngân hàng câu hỏi Excel</h2>
+      <div class="stage2-row">
+        <label for="stage2-file">Chọn file</label><input id="stage2-file" class="input" type="file" accept=".xlsx,.xls">
+        <button id="btn-stage2-parse" class="btn btn-primary" type="button" disabled>Đọc và kiểm tra Excel</button>
+      </div>
+      <progress id="stage2-progress" value="0" max="100" style="width:100%"></progress>
+      <p id="stage2-progress-status" class="stage2-note" role="status" aria-live="polite">Chưa chọn file.</p>
+      <div class="stage2-grid" aria-label="Thống kê sau phân tích">
+        <div class="stage2-kpi"><span>Câu hợp lệ</span><strong id="parsed-questions">–</strong></div>
+        <div class="stage2-kpi"><span>Học sinh hợp lệ</span><strong id="parsed-students">–</strong></div>
+        <div class="stage2-kpi"><span>Dòng tự luận LA bỏ qua</span><strong id="parsed-la">–</strong></div>
+        <div class="stage2-kpi"><span>Dòng lỗi</span><strong id="parsed-invalid">–</strong></div>
+      </div>
+      <h3 style="margin-top:16px">Câu hỏi theo khối</h3>
+      <div class="stage2-scroll"><table class="stage2-table"><thead><tr><th>Khối</th><th>C1</th><th>C2</th><th>C3</th></tr></thead><tbody id="stage2-graded-stats"><tr><td colspan="4">Chưa phân tích.</td></tr></tbody></table></div>
+      <h3 style="margin-top:16px">Các cảnh báo cần xem</h3>
+      <div class="stage2-scroll"><table class="stage2-table"><thead><tr><th>Sheet</th><th>Dòng</th><th>Nội dung</th></tr></thead><tbody id="stage2-issues"><tr><td colspan="3">Chưa phân tích.</td></tr></tbody></table></div>
+      <div class="stage2-row"><button id="btn-stage2-import" class="btn btn-primary" type="button" disabled>Nhập dữ liệu đã kiểm tra</button></div>
+      <p class="stage2-note"><strong>Lưu ý:</strong> Bước phân tích chỉ đọc file trong máy, không gửi dữ liệu lên mạng. Chỉ khi nhấn “Nhập dữ liệu” mới lưu vào IndexedDB (Demo) hoặc Supabase (đã đăng nhập giáo viên). Các lô đã lưu sẽ không tự hoàn tác nếu một lô sau gặp lỗi.</p>
+    </section>
+    <section class="stage2-panel" aria-labelledby="stage2-samples"><h2 id="stage2-samples">4. Dữ liệu mẫu / dữ liệu đã nhập</h2>
+      <div class="stage2-scroll"><table class="stage2-table"><thead><tr><th>Mã HS</th><th>Họ tên</th><th>Lớp</th></tr></thead><tbody id="stage2-student-list"><tr><td colspan="3">Đang tải...</td></tr></tbody></table></div>
+    </section>
+    <footer class="stage2-note">Trang kiểm thử kỹ thuật Chặng 2 – không phải cổng phụ huynh hoặc cổng học sinh chính thức. Cổng học sinh, chấm điểm và các nút nghiệp vụ sẽ hoạt động ở Chặng 3–4.</footer>
+  </main>
+</body>
+</html>

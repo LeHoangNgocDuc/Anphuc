@@ -196,3 +196,18 @@ dialog{width:min(560px,calc(100% - 28px));max-height:min(88dvh,900px);overflow:a
 }
 #print-preview-content .print-sheet--a4>.fee-notice:first-child{border-right:.35mm dashed #64748b}
 @media print{.print-sheet--a4>.fee-notice:first-child{border-right:.35mm dashed #64748b!important}}
+
+/* Stage 4.1: demo name + registered phone chooser, no OTP in demo mode. */
+.namephone-shell{display:grid;gap:12px;padding:16px;border:1px solid var(--border);border-radius:15px;background:var(--surface-muted);margin-top:12px;max-width:640px}
+.namephone-shell h3{font-size:16px;line-height:1.45;color:var(--ink);margin:0}
+.namephone-form{display:grid;gap:11px;max-width:100%}
+.namephone-search-field{position:relative}
+.namephone-search-field .input,.namephone-form .input{width:100%}
+.namephone-results{position:relative;z-index:5;display:grid;gap:3px;max-height:230px;overflow-y:auto;margin-top:4px;padding:6px;border:1px solid var(--border);border-radius:11px;background:var(--surface);box-shadow:var(--shadow-sm)}
+.namephone-option{display:block;text-align:left;width:100%;padding:11px 12px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.namephone-option:hover,.namephone-option:focus-visible{background:var(--primary-soft);color:var(--primary-strong);outline:2px solid var(--primary)}
+.namephone-selected{font-size:12px;font-weight:700;color:var(--primary-strong)}
+.namephone-warning{border-top:1px solid var(--border);padding-top:9px}
+.namephone-form button[type="submit"]{justify-self:start}
+@media(max-width:600px){.namephone-shell{padding:12px}.namephone-form button[type="submit"]{width:100%}}
+@media print{.namephone-shell{display:none!important}}

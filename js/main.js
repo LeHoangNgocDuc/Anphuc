@@ -43,7 +43,7 @@ async function main(){
   document.documentElement.dataset.backend=db.mode;
   if(db.mode==='demo'){
     const ribbon=document.createElement('div');ribbon.className='stage3-demo-ribbon';
-    ribbon.textContent='CHẾ ĐỘ DEMO · dữ liệu giả định · OTP 123456 · không nhập dữ liệu cá nhân thật';
+    ribbon.textContent='CHẾ ĐỘ DEMO · Dữ liệu mẫu · Tìm tên + số điện thoại (không OTP) · Không nhập dữ liệu thật';
     document.body.append(ribbon);
   }
   await switchView();

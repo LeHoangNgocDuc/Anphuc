@@ -185,6 +185,7 @@ export class LocalDemoAdapter {
     this.identity = {id:'demo-admin',role:'admin',demo:true};
     this.config = config;
     this.attemptReceipts = new Map();
+    this.demoLoginFailures = new Map();
   }
   async init() {
     await this.storage.init();
@@ -207,11 +208,38 @@ export class LocalDemoAdapter {
     this.identity = {id:`demo-phone-${normalized}`,role:'parent',phone:normalized,demo:true};
     return this.getSession();
   }
+  // The name/phone flow is intentionally DEMO ONLY. Do not expose real student
+  // data through a public lookup without verified server-side authentication.
+  async searchDemoStudents(query) {
+    const normalize = (x) => String(x ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\u0111/gi,'d').toLocaleLowerCase('vi-VN').trim();
+    const term=normalize(query);
+    if (term.length<2) return [];
+    return (await this.list('students')).filter(x=>x.active!==false&&normalize(x.full_name).includes(term))
+      .slice(0,10).map(({id,full_name,class_name,grade})=>({id,full_name,class_name,grade}));
+  }
+  async signInDemoByStudentPhone({studentId,phone}={}) {
+    const normalized=normalizePhone(phone);
+    const key=String(studentId || '').trim();
+    if(!key||!normalized)throw new DatabaseError('Vui l\u00f2ng ch\u1ecdn h\u1ecdc sinh v\u00e0 nh\u1eadp s\u1ed1 \u0111i\u1ec7n tho\u1ea1i h\u1ee3p l\u1ec7.');
+    const now=Date.now();
+    const attempts=this.demoLoginFailures.get(key)||{count:0,until:0};
+    if(attempts.until>now)throw new DatabaseError('\u0110\u00e3 nh\u1eadp sai nhi\u1ec1u l\u1ea7n. Vui l\u00f2ng th\u1eed l\u1ea1i sau 2 ph\u00fat.');
+    const student=(await this.list('students')).find(x=>String(x.id)===key&&x.active!==false);
+    if(!student||normalizePhone(student.parent_phone)!==normalized) {
+      attempts.count++;
+      attempts.until=attempts.count>=5?now+120000:0;
+      this.demoLoginFailures.set(key,attempts);
+      throw new DatabaseError('Th\u00f4ng tin h\u1ecdc sinh v\u00e0 s\u1ed1 \u0111i\u1ec7n tho\u1ea1i kh\u00f4ng kh\u1edbp. Vui l\u00f2ng ki\u1ec3m tra l\u1ea1i.');
+    }
+    this.demoLoginFailures.delete(key);
+    this.identity={id:`demo-parent-${key}`,role:'parent',phone:normalized,studentId:key,demo:true};
+    return this.getSession();
+  }
   async signOut() { this.identity={id:'demo-guest',role:'guest',demo:true}; return {signedOut:true}; }
   async list(table) { return this.storage.getAll(table); }
   async getStudents({grade,className,phone,active} = {}) {
     let rows = await this.list('students');
-    if (this.identity.role === 'parent') rows=rows.filter(x=>x.parent_phone===this.identity.phone);
+    if (this.identity.role === 'parent') rows=rows.filter(x=>x.parent_phone===this.identity.phone && (!this.identity.studentId || x.id===this.identity.studentId));
     if (grade !== undefined && grade !== '') rows=rows.filter(x=>Number(x.grade)===Number(grade));
     if (className) rows=rows.filter(x=>x.class_name===className);
     if (phone) rows=rows.filter(x=>x.parent_phone===normalizePhone(phone));

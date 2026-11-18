@@ -1,3 +1,4 @@
+import {mountNamePhoneDemo} from './name-phone-demo.js';
 /** Student portal Stage 3: OTP, siblings, 3-level practice, server-graded results. */
 import { normalizePhone } from '../config.js';
 import { LEVELS, prepareAttempt, isLevelUnlocked, levelsFromCatalog, lessonMetrics } from '../lms-engine.js';
@@ -54,6 +55,9 @@ export function mountStudentPortal({db,onAuthChange=()=>{}}){
     });
     ui.loginForm.after(form);input.focus();
   }
+
+  mountNamePhoneDemo({db,portal:'student',originalForm:ui.loginForm,message:ui.message,
+    onLogin:async()=>{onAuthChange();await activate(true);}});
 
   async function activate(force=false){
     const session=await db.getSession();

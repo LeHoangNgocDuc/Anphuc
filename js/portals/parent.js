@@ -1,3 +1,4 @@
+import {mountNamePhoneDemo} from './name-phone-demo.js';
 /** Parent portal Stage 3: real OTP, multiple children, progress, attendance & tuition. */
 import { normalizePhone } from '../config.js';
 import { levelsFromCatalog, lessonMetrics } from '../lms-engine.js';
@@ -40,6 +41,9 @@ export function mountParentPortal({db,onAuthChange=()=>{}}){
     });
     ui.form.after(form);inp.focus();
   }
+  mountNamePhoneDemo({db,portal:'parent',originalForm:ui.form,message:ui.message,
+    onLogin:async()=>{onAuthChange();await activate(true);}});
+
   async function activate(force=false){
     const session=await db.getSession();
     if(!['parent','teacher','admin'].includes(session.role))return;
